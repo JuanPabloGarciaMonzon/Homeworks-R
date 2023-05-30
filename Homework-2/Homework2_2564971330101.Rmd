@@ -1,0 +1,60 @@
+Funciones en R
+Una función en R es un objeto que contiene un conjunto de enunciados interrelacionados que se ejecutan juntos en un orden predefinido.
+
+Estructura de una funcion
+function() { ... }
+
+Ejemplo de funcion
+```{r}
+nueva_funcion <- function() {
+  1+2
+}
+resultado <- nueva_funcion()
+print(resultado)
+```
+
+Argumentos de una funcion
+```{r}
+nueva_funcion <- function(x, y) {
+  x + y
+}
+```
+
+Argumentos por valor
+```{r}
+resultado <- nueva_funcion(3, 5)
+print(resultado)
+```
+Familia apply
+lapply
+es un caso especial de apply(), diseñado para aplicar funciones a todos los elementos de una lista. La l de su nombre se refiere, precisamente, a lista.
+```{r}
+funcion_lapply <- function() {
+  lista_lapply <- list(1:5, 6:10, 11:15)
+  lapply(lista_lapply, mean)
+}
+resultado_lapply <- funcion_lapply()
+print(resultado_lapply)
+```
+sapply
+Simplifica la salida convirtiendo la lista resultante en un vector o matriz si es posible. Toma los mismos argumentos de entrada que lapply y aplica una función especificada a cada elemento de una lista.
+```{r}
+funcion_sapply <- function() {
+  lista_sapply <- list(a = c(1,2,3), b = c(4,5,6))
+  sapply(lista_sapply, mean)
+}
+resultado_sapply <- funcion_sapply()
+print(resultado_sapply)
+```
+vapply
+la función vapply es similar a sapply, pero proporciona un argumento adicional para especificar el tipo y la longitud de la salida esperada. Esto puede ser útil para asegurarse de que su salida está en el formato correcto, o para evitar un error común de utilizar un formato incorrecto para la salida.
+```{r}
+funcion_vapply <- function() {
+  lista_vapply <- list(c(1, 2), c(3, 4, 5))
+  vapply(lista_vapply, FUN = length, FUN.VALUE = 0L)
+}
+resultado_vapply <- funcion_vapply()
+print(resultado_vapply)
+```
+
+
