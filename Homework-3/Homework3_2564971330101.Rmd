@@ -1,0 +1,79 @@
+- Investigue cómo leer un archivo CSV desde R.
+Para leer un archivo CSV desde R, se puede utilizar la función read.csv() o 
+alguna de sus variantes.
+
+Si el archivo CSV tiene un encabezado en la primera fila con los nombres de las 
+columnas, la función read.csv() utilizará esos nombres por defecto. Si el 
+archivo no tiene encabezado, se puede agregar el argumento header = FALSE para 
+indicar que no se debe interpretar la primera fila como nombres de columna.
+
+- Investigue acerca de la función select() de la paquetería de dplyr
+La función select() es parte del paquete dplyr, una popular librería de 
+manipulación de datos en R. La función select() se utiliza para seleccionar 
+columnas específicas de un conjunto de datos.
+
+- Lea el dataset compartido (primary_results.csv) y asignelo a la 
+variable dataset_results.
+```{r}
+
+ruta <- "primary_results.csv"
+dataset_results <- read.csv(ruta)
+print(dataset_results)
+```
+- Filtrar todos los votos del estado de Florida.
+```{r}
+install.packages("dplyr")
+library(dplyr)
+estado <- "Florida"
+votos_estado <- dataset_results %>%
+filter(state == estado) %>%
+select(votes)
+print(votos_estado)
+```
+
+- Filtrar votos para los candidatos Hillary Clinton o Donald Trump
+```{r}
+votos_candidatos <- dataset_results %>%
+  filter(candidate == "Hillary Clinton" | candidate == "Donald Trump")
+print(votos_candidatos)
+```
+
+- Filtrar votos para el partido Demócrata y el condado Shelby
+```{r}
+party_votos <- dataset_results %>%
+  filter(party == "Democrat" | county == "Shelby")
+print(party_votos)
+```
+Filtrar votos para el estado de Alabama y que la cantidad de votos sea mayor a
+15000.
+```{r}
+party_votos <- dataset_results %>%
+  filter(state == "Alabama" | votes >= 15000)
+print(party_votos)
+```
+Utilice la función select y arrange para el siguiente filtrado
+Filtrar votos para el estado de Texas y el condado Denton, seleccionando
+únicamente las columnas party, candidate, votes, luego ordene de forma
+descendente por la columna votes.
+
+```{r}
+votos_filtrados <- dataset_results %>%
+  filter(state == "Texas" & county == "Denton") %>%
+  select(party, candidate, votes) %>%
+  arrange(desc(votes))
+print(votos_filtrados)
+```
+
+Utilice el verbo mutate y arrange para el siguiente filtrado:
+Filtrar por el partido Republicano, que el candidato sea Ted Cruz en el estado de
+Alaska, luego agregue una columna que se llame vote_count que sea la división de
+votes por fraction_votes (votes/fraction_votes), finalmente ordene de forma
+descendente por vote_count.
+```{r}
+votos_filtrados_ted_cruz <- dataset_results %>%
+  filter(state == "Alaska" & party == "Republican" & candidate == "Ted Cruz") %>%
+  mutate(vote_count = votes / fraction_votes) %>%
+  arrange(desc(vote_count))
+print(votos_filtrados_ted_cruz)
+```
+
