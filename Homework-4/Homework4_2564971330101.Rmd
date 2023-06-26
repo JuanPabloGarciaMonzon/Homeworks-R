@@ -1,0 +1,65 @@
+Construya la variable diamonds que contenga la lectura del CSV, luego explore el data frame con la función str( ).
+```{r}
+diamonds <- read.csv("diamonds.csv")
+str(diamonds)
+print(diamonds)
+```
+Construya un gráfico de dispersión colocando en la estética carat (eje x) versus
+price (eje y), luego devuelva el gráfico
+```{r}
+install.packages("ggplot2")
+library(ggplot2)
+plot_dispersion <- ggplot(diamonds, aes(x = carat, y = price)) + geom_point()
+plot_dispersion
+```
+
+Edite la estética y mapee el color con la variable clarity.Devuelva el gráfico con esta modificación.
+```{r}
+plot_dispersion <- ggplot(diamonds, aes(x = carat, y = price , color = clarity)) + geom_point()
+plot_dispersion
+```
+Construya el tipo de geometría histograma para la variable price. Configure el
+parámetro bins con el valor 40 y devuelva el gráfico.
+
+```{r}
+
+plot_histograma <- ggplot(diamonds, aes(x = price)) + geom_histogram(bins = 40)
+plot_histograma
+```
+
+Agregue una escala logarítmica de base 10 y devuelva el gráfico para ver la
+diferencia.
+```{r}
+plot_histograma <- ggplot(diamonds, aes(x = price)) + geom_histogram(bins = 40) + scale_y_log10()
+
+plot_histograma
+```
+Construya un gráfico de cajas colocando en la estética la variable cut (eje x)
+versus price (eje y). Agregue una escala logarítmica por defecto y por último
+devuelva el gráfico.
+
+```{r}
+plot_boxplot <- ggplot(diamonds, aes(x = cut, y = price)) + geom_boxplot() +
+scale_y_log10()
+
+plot_boxplot
+```
+Edite el color de cada caja con el parámetro fill dentro de la estética y asignando
+la variable cut. Por último devuelva el gráfico.
+```{r}
+plot_boxplot <- ggplot(diamonds, aes(x = cut, y = price, fill = cut)) +
+  geom_boxplot() + scale_y_log10()
+
+plot_boxplot
+```
+
+Filtre diamonds por la variable price que sea mayor a 1000 y por cut que
+contenga las categorías Good, Ideal y Premium. Luego asigne el resultado a la
+variable filtered_price. Dado que cut debe tomar en cuenta tres categorías
+específicas puede hacer uso del pipe %in%
+```{r}
+install.packages("dplyr")
+precio_filtrado <- filter(diamonds, carat %in% c(1) & cut %in% c("Good", "Ideal", "Premium"))
+print(precio_filtrado)
+```
+
