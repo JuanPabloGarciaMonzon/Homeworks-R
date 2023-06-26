@@ -59,7 +59,69 @@ variable filtered_price. Dado que cut debe tomar en cuenta tres categorías
 específicas puede hacer uso del pipe %in%
 ```{r}
 install.packages("dplyr")
-precio_filtrado <- filter(diamonds, carat %in% c(1) & cut %in% c("Good", "Ideal", "Premium"))
-print(precio_filtrado)
+library(dplyr)
+filtered_price <- filter(diamonds, price > 1000 & cut %in% c("Good", "Ideal", "Premium"))
+print(filtered_price)
+```
+2. Utilice la variable filtered_price para construir un gráfico de barras, en la estética
+configure x = cut, y = depth.
+```{r}
+bar_plot <- ggplot(filtered_price, aes(x = cut, y = depth)) +
+  geom_bar(stat = "identity")
+
+bar_plot
+```
+Por último aplique faceting para la variable clarity y devuelva la parcela de
+gráficos.
+```{r}
+bar_plot <- ggplot(filtered_price, aes(x = cut, y = depth)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ clarity)
+bar_plot
+```
+Edite la estética y configure el parámetro fill con la variable clarity. Luego
+devuelva la parcela de gráficos con esta modificación.
+```{r}
+bar_plot <- ggplot(filtered_price, aes(x = cut, y = depth, fill = clarity)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ clarity)
+
+bar_plot
+```
+ Utilice diamonds para construir un agrupamiento por la variable cut, luego aplique
+summarize para encontrar la media de las variables x, y, z (los nombres de los valores
+sumarizados serán mediaX, mediaY, mediaZ, respectivamente). Asigne el resultado a la
+variable median_dimension_diamond, por último imprima la variable.
+```{r}
+median_dimension_diamond <- diamonds %>%
+  group_by(cut) %>%
+  summarize(mediaX = mean(x),
+            mediaY = mean(y),
+            mediaZ = mean(z))
+
+print(median_dimension_diamond)
+```
+Utilice diamonds para filtrar por la variable cut igual a Premium. Luego agrupe por la
+variable clarity y utilice summarize para encontrar minimo y maximo de price (los
+nombres de los valores sumarizados serán minPrice y maxPrice, respectivamente).
+```{r}
+premium_filtered <- diamonds %>%
+  filter(cut == "Premium")
+
+cut_premium <- premium_filtered %>%
+  group_by(clarity) %>%
+  summarize(minPrice = min(price),
+            maxPrice = max(price))
+
+print(cut_premium)
+```
+Construya un gráfico de barras y utilice cut_premium como set de datos, configure
+x=clarity, y=maxPrice y el color de relleno (fill) con la variable clarity. Por último
+devuelva el gráfico.
+```{r}
+bar_plot_premium <- ggplot(cut_premium, aes(x = clarity, y = maxPrice, fill = clarity)) +
+  geom_bar(stat = "identity")
+
+bar_plot_premium
 ```
 
