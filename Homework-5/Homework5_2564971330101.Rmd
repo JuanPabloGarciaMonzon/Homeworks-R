@@ -1,0 +1,128 @@
+Imports
+```{r}
+library(conflicted)
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+library(tidyverse)
+```
+
+Cargue cada set de datos y nombrelo según cada archivo.
+```{r}
+ruta_answers <- "answers.csv"
+answers <- read_csv(ruta_answers, show_col_types = FALSE)
+
+ruta_questions <- "questions.csv"
+questions <- read_csv(ruta_questions, show_col_types = FALSE)
+
+ruta_question_tags <- "question_tags.csv"
+question_tags <- read_csv(ruta_question_tags, show_col_types = FALSE)
+
+ruta_tags <- "tags.csv"
+tags <- read_csv(ruta_tags, show_col_types = FALSE)
+```
+Utilice left_joins
+Relacione questions y question_tags usando las columnas id y question_id, respectivamente.
+```{r}
+merged_data <- merge(questions, question_tags, by.x = "id", by.y = "question_id", all.x = TRUE)
+```
+
+Agregue una relación más para la tabla tags.
+```{r}
+merged_data <- merge(merged_data, tags, by.x = "tag_id", by.y = "id", all.x = TRUE)
+```
+
+Utilice replace_na para cambiar los NA en la columna tag_name a "only-r".
+```{r}
+merged_data <- merged_data %>% mutate(tag_name = replace_na(tag_name, "only-r"))
+```
+
+Por último, almacene el resultado en la variable questions_with_tags
+```{r}
+questions_with_tags <- merged_data
+print(questions_with_tags)
+```
+
+Comparing scores across tags
+Realice un breve análisis, para ello utilice verbos de la familia dplyr 
+como group by, summarize,
+arrange y averigue el score promedio de las preguntas más frecuentes.
+
+Utilice questions_with_tags y aplique group_by para la variable tag_name.
+```{r}
+grouped_data <- questions_with_tags %>% group_by(tag_name)
+print(grouped_data)
+```
+
+Aplique summarize para obtener el score promedio de cada pregunta y asígnele el
+nombre mean_score.
+```{r}
+grouped_data <- questions_with_tags %>% group_by(id)
+summary_data <- grouped_data %>% summarize(mean_score = mean(score))
+```
+
+Ordene mean_score en forma descendente.
+```{r}
+sorted_data <- summary_data %>% arrange(desc(mean_score))
+sorted_data
+```
+Finding gaps between questions and answers
+
+Ahora uniremos questions con answers. Asegúrese de explorar las tablas y sus columnas en la
+consola antes de comenzar el ejercicio.
+
+Utilice inner_join para combinar las tablas questions y answers, luego aplique los sufijos
+"_question" y "_answer", respectivamente.
+
+```{r}
+combined_data <- inner_join(questions, answers, by = c("id" = "question_id"), suffix  = c("_question", "_answer"))
+combined_data
+```
+Agregue una nueva columna utilizando la función mutate. La nueva columna se llamará
+gap y contendrá la resta de creation_date_answer y creation_date_question.
+(creation_date_answer - creation_date_question).
+```{r}
+combined_data <- combined_data %>%
+  mutate(gap = creation_date_answer - creation_date_question)
+combined_data
+```
+Joining question and answer counts
+También podemos determinar cuántas preguntas realmente arrojan respuestas. Si contamos el
+número de respuestas para cada pregunta, podemos unir los conteos de respuestas con la tabla
+de preguntas.
+
+Cuente y ordene la columna question_id en la tabla de answers, luego almacene el
+resultado en la variable answer_counts.
+```{r}
+answer_counts <- answers %>%
+  count(question_id) %>%
+  arrange(desc(n))
+```
+Relacione la tabla questions con answer_counts (utilice left_join)
+```{r}
+merged_counts <- left_join(questions, answer_counts, by = c("id" = "question_id"))
+
+```
+Reemplace los valores NA en la columna n con ceros.
+```{r}
+merged_counts <- merged_counts %>%
+  mutate(n = replace_na(n, 0))
+```
+Por último almacene el resultado en la variable question_answer_counts
+```{r}
+question_answer_counts <- merged_counts
+question_answer_counts
+```
+Joining questions, answers, and tags
+Identifiquemos qué temas de R generan más interés en Stack Overflow.
+Combine question_tags con question_answer_counts usando inner_join.
+```{r}
+merged_questions_inner <- inner_join(questions, question_answer_counts, by = c("id" = "id"))
+merged_questions_inner
+```
+Ahora, use otro inner_join para agregar la tabla tags
+```{r}
+merged_questions_tags_inner <- inner_join(merged_questions_inner, tags, by = "id")
+merged_questions_tags_inner
+```
+
+
