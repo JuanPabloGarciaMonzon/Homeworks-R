@@ -22,7 +22,7 @@ View(airports)
 Inner-join
 Conecte fligths con planes
 ```{r}
-planes_flights <- merge(flights, planes, by = "tailnum")
+flights_planes <- merge(flights, planes, by = "tailnum")
 ```
 Conecte fligths con airlines
 ```{r}
@@ -31,8 +31,8 @@ flights_airlines <- merge(flights, airlines, by.x = "carrier", by.y = "carrier")
 Conecte fligths con airports (según el esquema de arriba existe una doble relación de
 airports hacía fligths)
 ```{r}
-flights_airports <- merge(flights, airports, by.x = "origin", by.y = "faa")
-double_flights_airports <- merge(flights_airports, airports, by.x = "dest", by.y = "faa")
+flights_airports_origin <- merge(flights, airports, by.x = "origin", by.y = "faa")
+flights_airports_dest <- merge(flights_airports_origin, airports, by.x = "dest", by.y = "faa")
 ```
 
 Conecte flights con weather (según esquema de arriba, hay 5 variables que relacionan
@@ -108,12 +108,35 @@ arr_delay, establezca el parámetro na.rm en TRUE y asigne al promedio el nombre
 delay. Conecte el resultado anterior por medio de inner_join a la tabla airports y
 asignelo a la variable flights_airports
 ```{r}
-filtered_flights <- flights %>%
+flights_airports <- flights %>%
   filter(year == 2013, month == 5, day == 10) %>%
   group_by(dest) %>%
-  summarize(delay = mean(arr_delay, na.rm = TRUE))
-colnames(filtered_flights)[1] <- "dst"
-filteredflights_airports <- inner_join(filtered_flights, airports, by = "dst")
-filteredflights_airports
+  summarize(delay = mean(arr_delay, na.rm = TRUE))%>%
+inner_join(airports, by = c("dest" = "faa"))
+flights_airports
+```
+
+Utilice la variable flights_airports para crear un gráfico de puntos tomando de eje x la
+variable lon y para y la variable lat. Defina el color y el tamaño por medio de la
+variable delay. El tamaño se establece por medio del parámetro size.
+```{r}
+ggplot(flights_airports, aes(x = lon, y = lat, color = delay, size = delay)) +
+  geom_point() +
+  xlab("Longitud") +
+  ylab("Latitud") +
+  scale_color_gradient(low = "blue", high = "red") +
+  scale_size_continuous(range = c(2, 8)) +
+  ggtitle("Gráfico de puntos de vuelos y aeropuertos")
+```
+Utilice inner_join para combinar flights y planes. Agregue los sufijos _flights y _planes
+respectivamente. Por último utilice la función transmute para seleccionar las variables
+tailnum y manufacturer, pero además agregue la variable pi que almacene la suma de
+dep_delay y arr_delay, yluego divida por air_time. Ejemplo:
+(dep_delay + arr_delay) / air_time
+```{r}
+flights_planes <- inner_join(flights, planes, by = "tailnum", suffix  = c("_flights", "_planes"))
+result <- flights_planes %>%
+  transmute(tailnum, manufacturer, pi = (dep_delay + arr_delay) / air_time)
+result
 ```
 
